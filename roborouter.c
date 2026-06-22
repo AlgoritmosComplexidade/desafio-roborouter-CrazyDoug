@@ -1,17 +1,19 @@
 // Feito por Douglas Alves Costa
-// Nivel Novato
+// Nivel Aventureiro
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 // ALGORITMOS EM GRAFOS - Desafio RoboRouter (RescueBotics)
-// Nivel Novato: Representacao do labirinto usando Matriz de Adjacencias
+// Nivel Aventureiro: Busca pela vitima usando DFS
 
 #define MAX_VERTICES 10
 
 int grafo[MAX_VERTICES][MAX_VERTICES];
 int num_vertices = 0;
+bool visitados[MAX_VERTICES];
+bool caminhoEncontrado = false;
 
 void inicializarGrafo(int n) {
     num_vertices = n;
@@ -82,9 +84,42 @@ void exibirConexoes() {
     }
 }
 
+void inicializarVisitados() {
+    for (int i = 0; i < MAX_VERTICES; i++) {
+        visitados[i] = false;
+    }
+}
+
+void buscaProfundidade(int verticeAtual, int destino) {
+    visitados[verticeAtual] = true;
+
+    printf("%d ", verticeAtual);
+
+    if (verticeAtual == destino) {
+        caminhoEncontrado = true;
+        return;
+    }
+
+    for (int i = 0; i < num_vertices; i++) {
+        if (grafo[verticeAtual][i] == 1 && !visitados[i]) {
+            buscaProfundidade(i, destino);
+
+            if (caminhoEncontrado) {
+                return;
+            }
+        }
+    }
+}
+
+int validarVertice(int vertice) {
+    return vertice >= 0 && vertice < num_vertices;
+}
+
 int main() {
+    int origem, destino;
+
     printf("=== RESCUE BOTICS: ROBOROUTER ===\n");
-    printf("=== NIVEL NOVATO - MAPEANDO OS ESCOMBROS ===\n\n");
+    printf("=== NIVEL AVENTUREIRO - A BUSCA PELA VITIMA ===\n\n");
 
     inicializarGrafo(6);
 
@@ -99,7 +134,33 @@ int main() {
     imprimirGrafo();
     exibirConexoes();
 
-    printf("\nLabirinto armazenado com sucesso na memoria do RoboRouter!\n");
+    printf("\nDigite o vertice de origem: ");
+    scanf("%d", &origem);
+
+    printf("Digite o vertice de destino: ");
+    scanf("%d", &destino);
+
+    if (!validarVertice(origem) || !validarVertice(destino)) {
+        printf("\nErro: origem ou destino invalido.\n");
+        printf("Use vertices entre 0 e %d.\n", num_vertices - 1);
+        return 1;
+    }
+
+    inicializarVisitados();
+    caminhoEncontrado = false;
+
+    printf("\n--- Ordem dos vertices visitados pela DFS ---\n");
+    buscaProfundidade(origem, destino);
+
+    printf("\n\n--- Resultado da busca ---\n");
+
+    if (caminhoEncontrado) {
+        printf("Existe um caminho possivel entre o vertice %d e o vertice %d.\n", origem, destino);
+        printf("Vitima localizada com sucesso pelo RoboRouter!\n");
+    } else {
+        printf("Nao existe caminho possivel entre o vertice %d e o vertice %d.\n", origem, destino);
+        printf("O RoboRouter nao conseguiu alcancar a vitima por essa rota.\n");
+    }
 
     return 0;
 }
